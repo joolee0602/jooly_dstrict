@@ -115,7 +115,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14
 .rec-btn:hover{border-color:#ccc;background:#f5f5f2;}
 .rec-btn.on-pass{background:var(--pass-bg);border-color:var(--pass-bd);color:var(--pass-fg);}
 .rec-btn.on-cond{background:var(--warn-bg);border-color:#e8c07a;color:var(--warn-fg);}
-.rec-btn.on-drop{background:var(--drop-bg);border-color:var(--drop-bd);color:var(--drop-fg);}
+
 .rec-icon{display:block;font-size:20px;margin-bottom:4px;}
 
 /* 제출 */
@@ -269,14 +269,13 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14
     <div class="card">
       <div class="sec-hd">
         <div class="sec-num">3</div>
-        <div class="sec-title">면접관 최종 의견 &amp; 추천</div>
+        <div class="sec-title">면접관 최종 의견 &amp; 1차 결과</div>
       </div>
       <div style="margin-bottom:14px;">
-        <div class="field-label">합격 추천 여부 <span class="req">*</span></div>
+        <div class="field-label">1차 인터뷰 결과 <span class="req">*</span></div>
         <div class="rec-wrap">
-          <button class="rec-btn" id="rec_pass"><span class="rec-icon">✅</span>합격 추천</button>
-          <button class="rec-btn" id="rec_cond"><span class="rec-icon">⚠️</span>조건부 추천</button>
-          <button class="rec-btn" id="rec_drop"><span class="rec-icon">❌</span>비추천</button>
+          <button class="rec-btn" id="rec_pass"><span class="rec-icon">✅</span>합격</button>
+          <button class="rec-btn" id="rec_cond"><span class="rec-icon">⚠️</span>조건부 합격</button>
         </div>
       </div>
       <div>
@@ -472,7 +471,6 @@ function setRec(val) {
   state.rec = val;
   qs('rec_pass').className = 'rec-btn' + (val === 'pass' ? ' on-pass' : '');
   qs('rec_cond').className = 'rec-btn' + (val === 'cond' ? ' on-cond' : '');
-  qs('rec_drop').className = 'rec-btn' + (val === 'drop' ? ' on-drop' : '');
   updateProgress();
 }
 
@@ -481,7 +479,7 @@ function setRec(val) {
 // ══════════════════════════════════════════
 async function saveToNotion(d) {
   toast('📤 Notion에 저장 중...');
-  const recLabel = { pass:'✅ 합격 추천', cond:'⚠️ 조건부 추천', drop:'❌ 비추천' };
+  const recLabel = { pass:'✅ 합격 추천', cond:'⚠️ 조건부 합격' };
 
   function evalBlocks(items, title) {
     const blocks = [{ object:'block', type:'heading_3', heading_3:{ rich_text:[{ type:'text', text:{ content: title } }] } }];
@@ -516,26 +514,17 @@ async function saveToNotion(d) {
     { object:'block', type:'divider', divider:{} },
   ];
 
-  // Claude API를 프록시로 사용해서 CORS 우회
-  const prompt = `아래 JSON 데이터를 Notion API로 저장해줘.
-pageId: ${NOTION_PAGE_ID}
-token: ${NOTION_TOKEN}
-children: ${JSON.stringify(children)}
-
-위 내용을 Notion blocks API (PATCH https://api.notion.com/v1/blocks/{pageId}/children)로 저장하고 결과를 알려줘.`;
-
   try {
-    // Netlify Function을 통해 서버사이드에서 Notion API 호출 (CORS 우회)
-    const res = await fetch('/.netlify/functions/save-notion', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pageId: NOTION_PAGE_ID, children })
+    const res = await fetch('https://api.notion.com/v1/blocks/' + NOTION_PAGE_ID + '/children', {
+      method:'PATCH',
+      headers:{ 'Authorization':'Bearer ' + NOTION_TOKEN, 'Notion-Version':'2022-06-28', 'Content-Type':'application/json' },
+      body: JSON.stringify({ children })
     });
     const result = await res.json();
     if (res.ok) { toast('✅ Notion 저장 완료!'); }
-    else { toast('⚠️ 저장 실패: ' + (result.message || res.status)); }
+    else { toast('⚠️ Notion 저장 실패: ' + (result.message || res.status)); }
   } catch(e) {
-    toast('❌ 오류: ' + e.message);
+    toast('❌ Notion 오류: ' + e.message);
   }
 }
 
@@ -543,7 +532,7 @@ children: ${JSON.stringify(children)}
 //  결과 미리보기
 // ══════════════════════════════════════════
 function renderResult(d) {
-  const recLabel = { pass:'✅ 합격 추천', cond:'⚠️ 조건부 추천', drop:'❌ 비추천' };
+  const recLabel = { pass:'✅ 합격 추천', cond:'⚠️ 조건부 합격' };
   function tagClass(g) { return g === 'PASS' ? 'rt-pass' : g === 'MEET' ? 'rt-meet' : 'rt-drop'; }
   function evRows(items) {
     return items.map(function(item) {
@@ -663,7 +652,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // 추천 버튼
   qs('rec_pass').addEventListener('click', function() { setRec('pass'); });
   qs('rec_cond').addEventListener('click', function() { setRec('cond'); });
-  qs('rec_drop').addEventListener('click', function() { setRec('drop'); });
+
 
   // 제출
   qs('submitBtn').addEventListener('click', handleSubmit);
