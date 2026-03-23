@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1차 역량 인터뷰 평가</title>
+
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+
+:root {
+  /* d'strict 디자인 시스템 */
+  --bg:#f6f5f0; --card:#fff; --border:#e8e6df; --border-light:#eeede8;
+  --text:#1a1a18; --muted:#73726c; --hint:#a3a29c;
+  --blue:#185FA5; --blue-bg:#E6F1FB;
+  --red:#A32D2D; --red-bg:#FCEBEB;
+  --green:#3B6D11; --green-bg:#EAF3DE;
+  --purple:#534AB7; --purple-bg:#EEEDFE;
+  --teal:#0F6E56; --teal-bg:#E1F5EE;
+  --amber:#854F0B; --amber-bg:#FAEEDA;
+  --coral:#993C1D; --coral-bg:#FAECE7;
+  --radius:10px;
+  --font:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic','맑은 고딕',Arial,sans-serif;
+  /* 평가 등급 컬러 (스킬 시스템 기반) */
+  --pass-bg:var(--green-bg); --pass-fg:var(--green); --pass-bd:#b5d98a;
+  --meet-bg:var(--blue-bg);  --meet-fg:var(--blue);  --meet-bd:#8ec4f0;
+  --drop-bg:var(--red-bg);   --drop-fg:var(--red);   --drop-bd:#f0a0a0;
+  --warn-bg:var(--amber-bg); --warn-fg:var(--amber);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;font-weight:300;line-height:1.6;min-height:100vh;}
+
+/* 상단바 */
+.topbar{background:var(--purple);color:#fff;height:52px;display:flex;align-items:center;gap:12px;padding:0 24px;position:sticky;top:0;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,.18);}
+.topbar-logo{font-size:11px;font-weight:600;letter-spacing:0.3px;text-transform:uppercase;opacity:.8;}
+.topbar-sep{width:1px;height:16px;background:rgba(255,255,255,.2);}
+.topbar-title{font-size:13px;font-weight:500;letter-spacing:0.2px;}
+.topbar-badge{margin-left:auto;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;letter-spacing:0.3px;}
+
+/* 진행바 */
+.prog-bar{position:fixed;top:52px;left:0;right:0;height:3px;background:rgba(0,0,0,.05);z-index:40;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--teal));transition:width .4s;border-radius:0 2px 2px 0;}
+
+/* 콘텐츠 */
+.wrap{max-width:720px;margin:0 auto;padding:24px 16px 80px;}
+
+/* 공통 카드 */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+
+/* 섹션 헤더 */
+.sec-hd{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:1.5px solid var(--border-light);}
+.sec-num{width:22px;height:22px;border-radius:50%;background:var(--purple);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sec-num-plain{width:22px;height:22px;border-radius:50%;background:#f0f0ec;color:#666;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sec-title{font-size:13px;font-weight:600;letter-spacing:0.2px;}
+.sec-note{margin-left:auto;font-size:11px;color:var(--hint);}
+
+/* 필드 */
+.field-label{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px;letter-spacing:0.2px;}
+.req{color:var(--red);font-size:10px;margin-left:2px;}
+.field-input{width:100%;border:1px solid var(--border-light);border-radius:7px;padding:9px 12px;font-size:12.5px;font-family:inherit;color:var(--text);background:#fafaf8;outline:none;transition:border-color .15s,background .15s;}
+.field-input:focus{border-color:#8ec4f0;background:#fff;}
+.field-input::placeholder{color:var(--hint);}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.grid2:last-child{margin-bottom:0;}
+
+/* 후보자 카드 */
+.cand-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;gap:16px;}
+.avatar{width:42px;height:42px;border-radius:50%;background:var(--purple-bg);display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:700;color:var(--purple);flex-shrink:0;}
+.cand-name{font-size:1.3rem;font-weight:700;letter-spacing:-0.5px;}
+.cand-sub{font-size:.85rem;color:var(--muted);margin-top:2px;}
+
+/* 역량 항목 */
+.ev-item{border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;background:var(--card);transition:border-color .2s,background .2s;}
+.ev-item:last-child{margin-bottom:0;}
+.ev-item.needs-grade{border-color:#e8c060;background:var(--amber-bg);}
+.ev-item.graded{border-color:var(--border);background:var(--card);}
+.grade-hint{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--amber);background:var(--amber-bg);border:1px solid #e8c060;border-radius:10px;padding:2px 8px;flex-shrink:0;letter-spacing:0.3px;animation:pulse 2s infinite;}
+.grade-hint.hidden{display:none;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+.ev-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.ev-num{width:20px;height:20px;border-radius:50%;background:#f0f0ec;color:#999;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ev-name-input{flex:1;border:none;background:none;font-size:13px;font-weight:700;color:var(--text);font-family:inherit;outline:none;}
+.ev-name-input::placeholder{color:var(--hint);font-weight:400;}
+.ev-name-select{flex:1;border:none;background:none;font-size:13px;font-weight:700;color:var(--text);font-family:inherit;outline:none;cursor:pointer;appearance:auto;}
+
+/* 등급 토글 */
+.grade-wrap{display:flex;gap:4px;flex-shrink:0;}
+.grade-btn{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:#f5f5f5;color:var(--hint);font-family:inherit;transition:all .15s;}
+.grade-btn.pass.on{background:var(--pass-bg);color:var(--pass-fg);border-color:var(--pass-bd);}
+.grade-btn.meet.on{background:var(--meet-bg);color:var(--meet-fg);border-color:var(--meet-bd);}
+.grade-btn.drop.on{background:var(--drop-bg);color:var(--drop-fg);border-color:var(--drop-bd);}
+
+.del-btn{background:none;border:none;color:#ccc;cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;line-height:1;font-family:inherit;}
+.del-btn:hover{color:var(--red);background:#ffeaea;}
+
+.ev-textarea{width:100%;border:1px solid var(--border-light);border-radius:7px;padding:8px 10px;font-size:12px;font-family:inherit;color:var(--text);background:var(--bg);resize:none;outline:none;line-height:1.6;min-height:60px;}
+.ev-textarea:focus{border-color:#8ec4f0;background:#fff;}
+.ev-textarea::placeholder{color:var(--hint);}
+.ev-footer{display:flex;justify-content:flex-end;margin-top:3px;}
+.char-count{font-size:10px;color:var(--hint);}
+
+.add-btn{width:100%;margin-top:8px;background:none;border:1.5px dashed var(--border);border-radius:8px;padding:9px;font-size:12px;color:var(--hint);cursor:pointer;font-family:inherit;transition:border-color .15s,color .15s;display:flex;align-items:center;justify-content:center;gap:5px;}
+.add-btn:hover{border-color:var(--purple);color:var(--purple);}
+
+/* 종합의견 */
+.summary-box{background:var(--bg);border-radius:8px;padding:10px 12px;margin-top:12px;border:1px solid var(--border);}
+.summary-label{font-size:11px;font-weight:600;color:var(--hint);letter-spacing:0.3px;text-transform:uppercase;margin-bottom:5px;}
+.summary-textarea{width:100%;border:1px solid var(--border-light);border-radius:7px;padding:9px 12px;font-size:12.5px;font-family:inherit;color:var(--text);background:var(--card);resize:none;outline:none;line-height:1.7;min-height:80px;}
+.summary-textarea:focus{border-color:#8ec4f0;}
+.summary-textarea::placeholder{color:var(--hint);}
+
+/* 추천 버튼 */
+.rec-wrap{display:flex;gap:10px;margin-bottom:14px;}
+.rec-btn{flex:1;padding:12px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--card);cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;color:var(--muted);text-align:center;transition:all .15s;}
+.rec-btn:hover{border-color:#ccc;background:#f5f5f2;}
+.rec-btn.on-pass{background:var(--pass-bg);border-color:var(--pass-bd);color:var(--pass-fg);}
+.rec-btn.on-cond{background:var(--warn-bg);border-color:#e8c07a;color:var(--warn-fg);}
+.rec-btn.on-drop{background:var(--drop-bg);border-color:var(--drop-bd);color:var(--drop-fg);}
+.rec-icon{display:block;font-size:20px;margin-bottom:4px;}
+
+/* 제출 */
+.submit-wrap{margin-top:20px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.submit-btn{width:100%;max-width:400px;padding:15px;background:var(--purple);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;transition:background .15s;}
+.submit-btn:hover{background:#4239a0;}
+.submit-note{font-size:11px;color:var(--hint);}
+
+/* 완료 화면 */
+.done{display:none;text-align:center;padding:60px 24px;}
+.done.show{display:block;}
+.done-icon{font-size:52px;margin-bottom:16px;}
+.done-title{font-size:1.4rem;font-weight:700;margin-bottom:8px;}
+.done-sub{font-size:13px;color:var(--muted);margin-bottom:28px;}
+.done-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.btn-outline{padding:10px 20px;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;}
+.btn-accent{padding:10px 20px;border:none;border-radius:8px;background:var(--purple);color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;}
+
+/* 결과 미리보기 */
+.result-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-top:20px;text-align:left;}
+.result-section-title{font-size:11px;font-weight:700;color:var(--hint);letter-spacing:.08em;text-transform:uppercase;margin:12px 0 6px;}
+.result-section-title:first-child{margin-top:0;}
+.result-row{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border-light);align-items:flex-start;}
+.result-row:last-child{border-bottom:none;}
+.result-tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;flex-shrink:0;white-space:nowrap;}
+.rt-pass{background:var(--pass-bg);color:var(--pass-fg);}
+.rt-meet{background:var(--meet-bg);color:var(--meet-fg);}
+.rt-drop{background:var(--drop-bg);color:var(--drop-fg);}
+.result-name{font-size:12px;font-weight:700;min-width:90px;flex-shrink:0;}
+.result-desc{font-size:12px;color:var(--text);flex:1;line-height:1.6;}
+
+/* 토스트 */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--accent);color:#fff;padding:10px 20px;border-radius:8px;font-size:12px;font-weight:600;opacity:0;transition:all .3s;z-index:999;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-logo">HR</span>
+  <div class="topbar-sep"></div>
+  <span class="topbar-title">1차 역량 인터뷰 평가</span>
+  <span class="topbar-badge" id="progBadge">0 / 4 완료</span>
+</div>
+<div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+
+<div class="wrap">
+
+  <!-- 후보자 미리보기 카드 -->
+  <div class="cand-card">
+    <div class="avatar" id="avatarEl">?</div>
+    <div>
+      <div class="cand-name" id="candNameEl">후보자명</div>
+      <div class="cand-sub" id="candSubEl">조직 · 포지션 · 직급</div>
+    </div>
+  </div>
+
+  <!-- 폼 -->
+  <div id="formArea">
+
+    <!-- 채용 정보 -->
+    <div class="card">
+      <div class="sec-hd">
+        <div class="sec-num-plain">📋</div>
+        <div class="sec-title">채용 정보</div>
+        <span class="sec-note">면접 진행 포지션 및 후보자 정보를 입력해주세요.</span>
+      </div>
+      <div style="margin-bottom:10px;">
+        <div class="field-label">후보자명 <span class="req">*</span></div>
+        <input class="field-input" id="f_cand_name" placeholder="예: 홍길동">
+      </div>
+      <div class="grid2">
+        <div>
+          <div class="field-label">채용 조직 <span class="req">*</span></div>
+          <input class="field-input" id="f_dept" placeholder="예: 인사관리본부 / 인사팀">
+        </div>
+        <div>
+          <div class="field-label">채용 포지션 <span class="req">*</span></div>
+          <input class="field-input" id="f_position" placeholder="예: HR">
+        </div>
+      </div>
+      <div class="grid2">
+        <div>
+          <div class="field-label">채용 직급 <span class="req">*</span></div>
+          <select class="field-input" id="f_rank">
+            <option value="">직급 선택</option>
+            <option>매니저</option><option>선임</option><option>책임</option>
+            <option>수석</option><option>이사</option>
+          </select>
+        </div>
+        <div>
+          <div class="field-label">직책 (해당 시)</div>
+          <select class="field-input" id="f_position2">
+            <option value="">해당없음</option>
+            <option>팀장</option><option>그룹장</option>
+            <option>실장</option><option>본부장</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 면접관 정보 -->
+    <div class="card">
+      <div class="sec-hd">
+        <div class="sec-num-plain">✦</div>
+        <div class="sec-title">면접관 정보</div>
+      </div>
+      <div class="grid2">
+        <div>
+          <div class="field-label">면접관 이름 / 소속 · 직책 <span class="req">*</span></div>
+          <textarea class="field-input" id="f_iname" placeholder="예: 하태웅 (인사관리본부 / 본부장), 이주현 (인사팀 / 팀장)" rows="2" style="resize:none;overflow:hidden;line-height:1.6;min-height:38px;"></textarea>
+        </div>
+        <div>
+          <div class="field-label">면접일 <span class="req">*</span></div>
+          <input class="field-input" id="f_idate" type="date">
+        </div>
+      </div>
+    </div>
+
+    <!-- 핵심 업무역량 -->
+    <div class="card">
+      <div class="sec-hd">
+        <div class="sec-num">1</div>
+        <div class="sec-title">핵심 업무역량 평가</div>
+        <span class="sec-note">항목명 직접 입력 · PASS 우수 | MEET 보통 | DROP 미흡</span>
+      </div>
+      <div id="compList"></div>
+      <button class="add-btn" id="addCompBtn">＋ 역량 평가 항목 추가</button>
+      <div class="summary-box">
+        <div class="summary-label">역량 종합 의견 <span class="req">*</span></div>
+        <textarea class="summary-textarea" id="f_comp_summary" placeholder="핵심 업무역량 전반에 대한 종합 의견을 작성해주세요."></textarea>
+      </div>
+    </div>
+
+    <!-- CORE VALUE & FIT -->
+    <div class="card">
+      <div class="sec-hd">
+        <div class="sec-num">2</div>
+        <div class="sec-title">CORE VALUE &amp; FIT 평가</div>
+        <span class="sec-note">9개 핵심가치 중 확인된 항목 선택</span>
+      </div>
+      <div id="valueList"></div>
+      <button class="add-btn" id="addValueBtn">＋ 핵심가치 항목 추가</button>
+      <div class="summary-box">
+        <div class="summary-label">FIT 종합 의견 <span class="req">*</span></div>
+        <textarea class="summary-textarea" id="f_value_summary" placeholder="조직 문화, 가치관 적합성에 대한 종합 의견을 작성해주세요."></textarea>
+      </div>
+    </div>
+
+    <!-- 최종 의견 -->
+    <div class="card">
+      <div class="sec-hd">
+        <div class="sec-num">3</div>
+        <div class="sec-title">면접관 최종 의견 &amp; 추천</div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div class="field-label">합격 추천 여부 <span class="req">*</span></div>
+        <div class="rec-wrap">
+          <button class="rec-btn" id="rec_pass"><span class="rec-icon">✅</span>합격 추천</button>
+          <button class="rec-btn" id="rec_cond"><span class="rec-icon">⚠️</span>조건부 추천</button>
+          <button class="rec-btn" id="rec_drop"><span class="rec-icon">❌</span>비추천</button>
+        </div>
+      </div>
+      <div>
+        <div class="field-label">최종 의견 <span class="req">*</span></div>
+        <textarea class="summary-textarea" id="f_final" placeholder="후보자에 대한 전반적인 최종 의견 및 채용 판단 근거를 자유롭게 작성해주세요." style="min-height:100px;"></textarea>
+      </div>
+    </div>
+
+    <div class="submit-wrap">
+      <button class="submit-btn" id="submitBtn">📋 평가 제출하기</button>
+      <span class="submit-note">제출 후 결과를 확인하고 Notion에 저장됩니다</span>
+    </div>
+
+  </div><!-- /formArea -->
+
+  <!-- 완료 화면 -->
+  <div class="done" id="doneArea">
+    <div class="done-icon">🎉</div>
+    <div class="done-title">평가가 완료되었습니다</div>
+    <div class="done-sub" id="doneSub">수고하셨습니다.</div>
+    <div class="done-actions">
+      <button class="btn-outline" id="copyBtn">📋 데이터 복사</button>
+      <button class="btn-accent" onclick="window.print()">🖨️ 인쇄 / PDF</button>
+    </div>
+    <div class="result-box" id="resultBox"></div>
+  </div>
+
+</div><!-- /wrap -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+//  상태 데이터
+// ══════════════════════════════════════════
+const state = {
+  comp:  [{ name:'', grade:'', desc:'' }, { name:'', grade:'', desc:'' }, { name:'', grade:'', desc:'' }],
+  value: [{ name:'', grade:'', desc:'' }, { name:'', grade:'', desc:'' }, { name:'', grade:'', desc:'' }],
+  rec:   '',
+  submitted: null,
+};
+
+const NOTION_TOKEN   = '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';
+// URL 파라미터에서 pageId 받기 (없으면 기본 테스트 페이지)
+const _urlParams = new URLSearchParams(location.search);
+const NOTION_PAGE_ID = _urlParams.get('pageId') || '2fce00e68bd48078a081e5d7982699d5';
+
+// ══════════════════════════════════════════
+//  유틸
+// ══════════════════════════════════════════
+function qs(id) { return document.getElementById(id); }
+function toast(msg) {
+  const el = qs('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ══════════════════════════════════════════
+//  후보자 카드 업데이트
+// ══════════════════════════════════════════
+function updateCandCard() {
+  const name  = qs('f_cand_name').value.trim();
+  const dept  = qs('f_dept').value.trim();
+  const pos   = qs('f_position').value.trim();
+  const rank  = qs('f_rank').value;
+  const pos2  = qs('f_position2').value;
+  qs('candNameEl').textContent   = name || '후보자명';
+  qs('avatarEl').textContent     = name ? name.charAt(0) : '?';
+  const rankStr = [rank, pos2 && pos2 !== '해당없음' ? pos2 : ''].filter(Boolean).join(' / ');
+  qs('candSubEl').textContent    = [dept, pos, rankStr].filter(Boolean).join(' · ') || '조직 · 포지션 · 직급';
+}
+
+// ══════════════════════════════════════════
+//  진행도
+// ══════════════════════════════════════════
+function updateProgress() {
+  let done = 0;
+  if (qs('f_cand_name').value.trim() && qs('f_iname').value.trim()) done++;
+  if (qs('f_comp_summary').value.trim() && state.comp.some(i => i.grade)) done++;
+  if (qs('f_value_summary').value.trim() && state.value.some(i => i.grade)) done++;
+  if (state.rec && qs('f_final').value.trim()) done++;
+  qs('progFill').style.width = Math.round(done / 4 * 100) + '%';
+  qs('progBadge').textContent = done + ' / 4 완료';
+}
+
+// ══════════════════════════════════════════
+//  역량 항목 렌더링
+// ══════════════════════════════════════════
+function renderList(type) {
+  const list   = qs(type === 'comp' ? 'compList' : 'valueList');
+  const items  = state[type];
+  const label  = type === 'comp' ? '역량' : '핵심가치';
+  list.innerHTML = '';
+
+  items.forEach((item, i) => {
+    const CORE_VALUES = [
+      '', '협업 TEAMWORK', '창의 CREATIVITY', '역량 PERFORMANCE',
+      '소통 COMMUNICATION', '신뢰 TRUST', '정직 HONESTY',
+      '주인의식 OWNERSHIP', '열정 PASSION', '혁신 INNOVATION'
+    ];
+
+    const div = document.createElement('div');
+    div.className = 'ev-item';
+
+    const nameField = type === 'value'
+      ? '<select class="ev-name-select">' +
+          CORE_VALUES.map(function(v) {
+            return '<option value="' + v + '"' + (item.name === v ? ' selected' : '') + '>' + (v || '— 핵심가치 선택 —') + '</option>';
+          }).join('') +
+        '</select>'
+      : '<input class="ev-name-input" placeholder="역량 평가 항목 ' + (i + 1) + ' (직접 입력)" value="' + item.name.replace(/"/g, '&quot;') + '">';
+
+    const hasGrade = item.grade !== '';
+    div.className = 'ev-item ' + (hasGrade ? 'graded' : 'needs-grade');
+
+    div.innerHTML =
+      '<div class="ev-hd">' +
+        '<div class="ev-num">' + (i + 1) + '</div>' +
+        nameField +
+        '<span class="grade-hint' + (hasGrade ? ' hidden' : '') + '">⚠ 등급 선택</span>' +
+        '<div class="grade-wrap">' +
+          '<button class="grade-btn pass' + (item.grade === 'PASS' ? ' on' : '') + '">PASS</button>' +
+          '<button class="grade-btn meet' + (item.grade === 'MEET' ? ' on' : '') + '">MEET</button>' +
+          '<button class="grade-btn drop' + (item.grade === 'DROP' ? ' on' : '') + '">DROP</button>' +
+        '</div>' +
+        '<button class="del-btn">✕</button>' +
+      '</div>' +
+      '<textarea class="ev-textarea" placeholder="' + (type === 'comp'
+        ? '면접 중 확인된 구체적 사례나 답변을 중심으로 작성해주세요. (예: 수행한 프로젝트, 문제 해결 방식, 수치/성과 등)'
+        : '해당 가치가 드러난 발언이나 행동을 구체적으로 작성해주세요. (예: 협업 방식, 갈등 해결 경험, 조직 적응 사례 등)') + '">' + item.desc + '</textarea>' +
+      '<div class="ev-footer"><span class="char-count">' + item.desc.length + ' 자</span></div>';
+
+    // 이름 입력 (역량: input, 핵심가치: select)
+    const nameInputEl = div.querySelector('.ev-name-input');
+    const nameSelectEl = div.querySelector('.ev-name-select');
+    if (nameInputEl) nameInputEl.addEventListener('input', function() { items[i].name = this.value; });
+    if (nameSelectEl) nameSelectEl.addEventListener('change', function() { items[i].name = this.value; });
+
+    // 등급 버튼
+    div.querySelectorAll('.grade-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const g = this.classList.contains('pass') ? 'PASS' : this.classList.contains('meet') ? 'MEET' : 'DROP';
+        items[i].grade = g;
+        // 선택 즉시 hint 숨기고 graded 클래스 적용 (재렌더 없이)
+        div.classList.remove('needs-grade');
+        div.classList.add('graded');
+        const hint = div.querySelector('.grade-hint');
+        if (hint) hint.classList.add('hidden');
+        div.querySelectorAll('.grade-btn').forEach(function(b) { b.classList.remove('on'); });
+        this.classList.add('on');
+        items[i].grade = g;
+        updateProgress();
+      });
+    });
+
+    // 삭제 버튼
+    div.querySelector('.del-btn').addEventListener('click', function() {
+      if (items.length <= 1) { toast('⚠️ 최소 1개 항목은 필요합니다'); return; }
+      items.splice(i, 1);
+      renderList(type);
+      updateProgress();
+    });
+
+    // 서술 입력
+    const ta = div.querySelector('.ev-textarea');
+    const cc = div.querySelector('.char-count');
+    ta.addEventListener('input', function() {
+      items[i].desc = this.value;
+      cc.textContent = this.value.length + ' 자';
+      updateProgress();
+    });
+
+    list.appendChild(div);
+  });
+}
+
+// ══════════════════════════════════════════
+//  항목 추가
+// ══════════════════════════════════════════
+function addItem(type) {
+  state[type].push({ name:'', grade:'', desc:'' });
+  renderList(type);
+  const listEl = qs(type === 'comp' ? 'compList' : 'valueList');
+  const last = listEl.lastElementChild;
+  if (last) setTimeout(() => last.scrollIntoView({ behavior:'smooth', block:'center' }), 50);
+}
+
+// ══════════════════════════════════════════
+//  추천 버튼
+// ══════════════════════════════════════════
+function setRec(val) {
+  state.rec = val;
+  qs('rec_pass').className = 'rec-btn' + (val === 'pass' ? ' on-pass' : '');
+  qs('rec_cond').className = 'rec-btn' + (val === 'cond' ? ' on-cond' : '');
+  qs('rec_drop').className = 'rec-btn' + (val === 'drop' ? ' on-drop' : '');
+  updateProgress();
+}
+
+// ══════════════════════════════════════════
+//  Notion 저장
+// ══════════════════════════════════════════
+async function saveToNotion(d) {
+  toast('📤 Notion에 저장 중...');
+  const recLabel = { pass:'✅ 합격 추천', cond:'⚠️ 조건부 추천', drop:'❌ 비추천' };
+
+  function evalBlocks(items, title) {
+    const blocks = [{ object:'block', type:'heading_3', heading_3:{ rich_text:[{ type:'text', text:{ content: title } }] } }];
+    items.forEach(item => {
+      if (!item.name && !item.desc) return;
+      blocks.push({ object:'block', type:'bulleted_list_item', bulleted_list_item:{ rich_text:[
+        { type:'text', text:{ content: '[' + (item.grade||'-') + '] ' + (item.name||'(항목명 없음)') }, annotations:{ bold:true } },
+        { type:'text', text:{ content: item.desc ? ' — ' + item.desc : '' } }
+      ]}});
+    });
+    return blocks;
+  }
+
+  const children = [
+    { object:'block', type:'divider', divider:{} },
+    { object:'block', type:'heading_2', heading_2:{ rich_text:[{ type:'text', text:{ content:'1차 역량 인터뷰 평가 — ' + d.candName } }] } },
+    { object:'block', type:'paragraph', paragraph:{ rich_text:[{ type:'text', text:{ content:'📋 ' + d.dept + ' | ' + d.position + ' | ' + d.rank } }] } },
+    { object:'block', type:'paragraph', paragraph:{ rich_text:[{ type:'text', text:{ content:'👤 면접관: ' + d.iname + (d.idept ? ' (' + d.idept + ')' : '') + ' | 면접일: ' + d.idate } }] } },
+    { object:'block', type:'paragraph', paragraph:{ rich_text:[{ type:'text', text:{ content:'🏆 ' + (recLabel[d.rec] || d.rec) }, annotations:{ bold:true } }] } },
+    ...evalBlocks(d.comp, '📊 핵심 업무역량 평가'),
+    { object:'block', type:'paragraph', paragraph:{ rich_text:[
+      { type:'text', text:{ content:'역량 종합 의견: ' }, annotations:{ bold:true } },
+      { type:'text', text:{ content: d.compSummary } }
+    ]}},
+    ...evalBlocks(d.value, '💡 CORE VALUE & FIT 평가'),
+    { object:'block', type:'paragraph', paragraph:{ rich_text:[
+      { type:'text', text:{ content:'FIT 종합 의견: ' }, annotations:{ bold:true } },
+      { type:'text', text:{ content: d.valueSummary } }
+    ]}},
+    { object:'block', type:'heading_3', heading_3:{ rich_text:[{ type:'text', text:{ content:'✍️ 면접관 최종 의견' } }] } },
+    { object:'block', type:'paragraph', paragraph:{ rich_text:[{ type:'text', text:{ content: d.final } }] } },
+    { object:'block', type:'divider', divider:{} },
+  ];
+
+  // Claude API를 프록시로 사용해서 CORS 우회
+  const prompt = `아래 JSON 데이터를 Notion API로 저장해줘.
+pageId: ${NOTION_PAGE_ID}
+token: ${NOTION_TOKEN}
+children: ${JSON.stringify(children)}
+
+위 내용을 Notion blocks API (PATCH https://api.notion.com/v1/blocks/{pageId}/children)로 저장하고 결과를 알려줘.`;
+
+  try {
+    // Netlify Function을 통해 서버사이드에서 Notion API 호출 (CORS 우회)
+    const res = await fetch('/.netlify/functions/save-notion', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pageId: NOTION_PAGE_ID, children })
+    });
+    const result = await res.json();
+    if (res.ok) { toast('✅ Notion 저장 완료!'); }
+    else { toast('⚠️ 저장 실패: ' + (result.message || res.status)); }
+  } catch(e) {
+    toast('❌ 오류: ' + e.message);
+  }
+}
+
+// ══════════════════════════════════════════
+//  결과 미리보기
+// ══════════════════════════════════════════
+function renderResult(d) {
+  const recLabel = { pass:'✅ 합격 추천', cond:'⚠️ 조건부 추천', drop:'❌ 비추천' };
+  function tagClass(g) { return g === 'PASS' ? 'rt-pass' : g === 'MEET' ? 'rt-meet' : 'rt-drop'; }
+  function evRows(items) {
+    return items.map(function(item) {
+      return '<div class="result-row"><span class="result-tag ' + tagClass(item.grade) + '">' + (item.grade||'-') + '</span><span class="result-name">' + (item.name||'(없음)') + '</span><span class="result-desc">' + (item.desc||'') + '</span></div>';
+    }).join('');
+  }
+  qs('resultBox').innerHTML =
+    '<div class="result-section-title">📋 기본 정보</div>' +
+    '<div class="result-row"><span class="result-desc">' + d.candName + ' | ' + d.dept + ' ' + d.position + ' ' + d.rank + ' | 면접관: ' + d.iname + ' | ' + d.idate + '</span></div>' +
+    '<div class="result-section-title">📊 핵심 업무역량</div>' + evRows(d.comp) +
+    '<div class="result-row"><span class="result-name" style="font-weight:700">역량 종합</span><span class="result-desc">' + d.compSummary + '</span></div>' +
+    '<div class="result-section-title">💡 CORE VALUE & FIT</div>' + evRows(d.value) +
+    '<div class="result-row"><span class="result-name" style="font-weight:700">FIT 종합</span><span class="result-desc">' + d.valueSummary + '</span></div>' +
+    '<div class="result-section-title">✍️ 최종 의견</div>' +
+    '<div class="result-row"><span class="result-desc"><strong>' + (recLabel[d.rec]||d.rec) + '</strong><br>' + d.final + '</span></div>';
+}
+
+// ══════════════════════════════════════════
+//  제출
+// ══════════════════════════════════════════
+async function handleSubmit() {
+  const errs = [];
+  if (!qs('f_cand_name').value.trim()) errs.push('후보자명');
+  if (!qs('f_dept').value.trim())      errs.push('채용 조직');
+  if (!qs('f_position').value.trim())  errs.push('채용 포지션');
+  if (!qs('f_rank').value)             errs.push('채용 직급');
+  if (!qs('f_iname').value.trim())     errs.push('면접관 이름');
+  if (!qs('f_idate').value)            errs.push('면접일');
+  if (!state.comp.some(i => i.grade))  errs.push('역량 등급 (최소 1개)');
+  if (!qs('f_comp_summary').value.trim()) errs.push('역량 종합 의견');
+  if (!state.value.some(i => i.grade)) errs.push('Fit 등급 (최소 1개)');
+  if (!qs('f_value_summary').value.trim()) errs.push('FIT 종합 의견');
+  if (!state.rec)                      errs.push('합격 추천 여부');
+  if (!qs('f_final').value.trim())     errs.push('최종 의견');
+
+  if (errs.length) { toast('⚠️ 미입력: ' + errs[0] + (errs.length > 1 ? ' 외 ' + (errs.length - 1) + '건' : '')); return; }
+
+  const d = {
+    candName:     qs('f_cand_name').value.trim(),
+    dept:         qs('f_dept').value.trim(),
+    position:     qs('f_position').value.trim(),
+    rank:         qs('f_rank').value + (qs('f_position2').value && qs('f_position2').value !== '해당없음' ? ' / ' + qs('f_position2').value : ''),
+    iname:        qs('f_iname').value.trim(),
+    idate:        qs('f_idate').value,
+    idept:        qs('f_idept').value.trim(),
+    comp:         state.comp.map(function(i) { return { name:i.name, grade:i.grade, desc:i.desc }; }),
+    compSummary:  qs('f_comp_summary').value.trim(),
+    value:        state.value.map(function(i) { return { name:i.name, grade:i.grade, desc:i.desc }; }),
+    valueSummary: qs('f_value_summary').value.trim(),
+    rec:          state.rec,
+    final:        qs('f_final').value.trim(),
+    submittedAt:  new Date().toISOString(),
+  };
+
+  state.submitted = d;
+
+  // Notion 저장
+  await saveToNotion(d);
+
+  // 화면 전환
+  qs('formArea').style.display = 'none';
+  qs('progFill').style.width = '100%';
+  qs('progBadge').textContent = '제출 완료';
+  qs('doneSub').textContent = d.candName + ' 후보자 평가가 완료되었습니다.';
+  qs('doneArea').classList.add('show');
+  renderResult(d);
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+// ══════════════════════════════════════════
+//  초기화 (DOM 준비 후 실행)
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+
+  // URL 파라미터로 미리 채우기
+  const p = new URLSearchParams(location.search);
+  if (p.get('name'))     { qs('f_cand_name').value = p.get('name'); }
+  if (p.get('dept'))     { qs('f_dept').value = p.get('dept'); }
+  if (p.get('position')) { qs('f_position').value = p.get('position'); }
+  if (p.get('rank'))     { qs('f_rank').value = p.get('rank'); }
+  if (p.get('date'))     { qs('f_idate').value = p.get('date'); }
+
+  // pageId 표시 (어느 Notion 페이지에 저장될지 topbar에 표시)
+  if (p.get('pageId')) {
+    const badge = qs('progBadge');
+    if (badge) badge.title = 'Notion Page: ' + p.get('pageId');
+  }
+
+  // 항목 초기 렌더
+  renderList('comp');
+  renderList('value');
+
+  // 후보자 카드 실시간 업데이트
+  ['f_cand_name','f_dept','f_position','f_rank','f_position2'].forEach(function(id) {
+    qs(id).addEventListener('input', function() { updateCandCard(); updateProgress(); });
+    qs(id).addEventListener('change', function() { updateCandCard(); updateProgress(); });
+  });
+
+  // 면접관 정보 진행도
+  ['f_iname','f_idate','f_comp_summary','f_value_summary','f_final'].forEach(function(id) {
+    qs(id).addEventListener('input', updateProgress);
+  });
+
+  // 면접관 textarea 자동 높이 조절
+  const inameEl = qs('f_iname');
+  if (inameEl) {
+    inameEl.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = this.scrollHeight + 'px';
+    });
+  }
+
+  // 항목 추가 버튼
+  qs('addCompBtn').addEventListener('click', function() { addItem('comp'); });
+  qs('addValueBtn').addEventListener('click', function() { addItem('value'); });
+
+  // 추천 버튼
+  qs('rec_pass').addEventListener('click', function() { setRec('pass'); });
+  qs('rec_cond').addEventListener('click', function() { setRec('cond'); });
+  qs('rec_drop').addEventListener('click', function() { setRec('drop'); });
+
+  // 제출
+  qs('submitBtn').addEventListener('click', handleSubmit);
+
+  // 복사
+  qs('copyBtn').addEventListener('click', function() {
+    if (!state.submitted) return;
+    navigator.clipboard.writeText(JSON.stringify(state.submitted, null, 2))
+      .then(function() { toast('✅ 데이터 복사 완료'); })
+      .catch(function() { toast('❌ 복사 실패'); });
+  });
+
+  // 초기 카드 업데이트
+  updateCandCard();
+  updateProgress();
+});
+</script>
+</body>
+</html>
